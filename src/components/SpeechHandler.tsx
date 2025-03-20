@@ -10,8 +10,24 @@ const SpeechHandler: React.FC = () => {
   const speak = (text: string): void => {
     const synth = window.speechSynthesis;
     const utterance = new SpeechSynthesisUtterance(text);
+  
+    // Get available voices
+    const voices = synth.getVoices();
+  
+    // Select an Indian English voice
+    const indianVoice = voices.find((voice) =>
+      voice.lang.includes("en-IN")
+    );
+  
+    if (indianVoice) {
+      utterance.voice = indianVoice;
+    } else {
+      console.warn("Indian voice not found. Using default voice.");
+    }
+  
     synth.speak(utterance);
   };
+  
 
   // STT function
   const startListening = (): void => {
