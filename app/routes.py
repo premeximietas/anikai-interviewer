@@ -14,13 +14,13 @@ router.add_api_route(
 )
 
 router.add_api_route(
-    "/interview",
+    "/interview/{interviewId}",
     UpdateInterView.patch,
     methods=["PATCh"],
 )
 
 router.add_api_route(
-    "/interview",
+    "/interview/{interviewId}",
     DeleteInterViews.delete,
     methods=["DELETE"],
 )
