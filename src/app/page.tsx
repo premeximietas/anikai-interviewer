@@ -1,15 +1,10 @@
-"use client";
+import MeetPage from '@/components/MeetPage'
+import React from 'react'
 
-import { InteractiveAvatar } from "@/components/InteractiveAvatar";
-
-export default function App() {
+const page = () => {
   return (
-    <div className="w-screen h-screen flex flex-col">
-      <div className="w-[900px] flex flex-col items-start justify-start gap-5 mx-auto pt-4 pb-4">
-        <div className="w-full">
-          <InteractiveAvatar />
-        </div>
-      </div>
-    </div>
-  );
+    <div><MeetPage/></div>
+  )
 }
+
+export default page
