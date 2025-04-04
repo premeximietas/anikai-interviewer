@@ -1,11 +1,15 @@
 "use client";
 import axios from "axios";
-import { Captions, EllipsisVertical, Hand, Info, Laugh, MessageSquareText, Mic, MicOff, MonitorUp, Phone, SendHorizontal, Shapes, Users, Video, VideoOff } from 'lucide-react';
+import { Captions, ChevronRight, EllipsisVertical, Hand, Info, Laugh, MessageSquareText, Mic, MicOff, MonitorUp, Phone, SendHorizontal, Shapes, Users, Video, VideoOff } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import DrawerModal from './DrawerModal';
 import { Input } from './ui/input';
 import UserView from './UserView';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import TypingText from "@/input-components/TypingText";
+import dayjs from "dayjs";
+import { Button } from "./ui/button";
+
 
 const MeetPage = () => {
     const [micOn, setMicOn] = useState(false);
@@ -17,6 +21,9 @@ const MeetPage = () => {
     const [isBotSpeaking, setIsBotSpeaking] = useState(false);
     const [isUserSpeaking, setIsUserSpeaking] = useState(false);
     const audioContextRef = useRef<AudioContext | null>(null); // 🔹 Keep AudioContext persistent
+    const [botMessage, setBotMessage] = useState<string>("Hi Aniket, Welcome to interview at eximietas design, lets start with your introduction first"); // Stores bot message
+    const [showCaptions, setShowCaptions] = useState(false);
+    const [showConfirmation, setShowConfirmation] = useState(false);
 
     const {
         transcript,
@@ -79,7 +86,7 @@ const MeetPage = () => {
     }, [micOn]);
 
     useEffect(() => {
-        greetWithTTS("Welcome Aniket, to interview at eximietas design,Introduce yourself");
+        greetWithTTS(botMessage);
     }, []);
 
     async function greetWithTTS(text: string) {
@@ -150,6 +157,16 @@ const MeetPage = () => {
         }
     }
 
+    // useEffect(() => {
+    //     if (botMessage) {
+    //       setShowCaptions(true);
+    //       const timer = setTimeout(() => {
+    //         setShowCaptions(false);
+    //       }, 3000);
+    //       return () => clearTimeout(timer);
+    //     }
+    //   }, [botMessage]);
+
     return (
         <div className="w-full h-screen flex flex-col justify-center items-center p-6">
             <div className={`w-full h-dvh grid gap-4 overflow-auto p-7
@@ -164,24 +181,26 @@ const MeetPage = () => {
             </div>
 
             <div className='flex flex-row w-full justify-between items-center my-auto'>
-                <span>11:25 AM | axi-uxwm-dbm</span>
-                <div className='flex flex-row gap-x-3 '>
-                    <div onClick={() => { setIsUserSpeaking(!isUserSpeaking); setMicOn(!micOn) }} className=' px-3 bg-white rounded-lg py-2.5'>{!micOn ? <MicOff className='h-5 text-red-950' /> : <Mic className='h-5 text-red-950' />}</div>
-                    <div onClick={() => setCameraOn(!cameraOn)} className=' px-3 bg-white rounded-lg py-2.5'>{!cameraOn ? <VideoOff className='h-5 text-red-950' /> : <Video className='h-5 text-red-950' />}</div>
-                    <div className=' px-3 bg-gray-600 rounded-full py-2.5'><Captions className='h-5' /></div>
-                    <div className=' px-3 bg-gray-600 rounded-full py-2.5'><Laugh className='h-5' /></div>
-                    <div className=' px-3 bg-gray-600 rounded-full py-2.5'><MonitorUp className='h-5' /></div>
-                    <div className=' px-3 bg-gray-600 rounded-full py-2.5'><Hand className='h-5' /></div>
-                    <div className=' px-1 bg-gray-600 rounded-full py-2.5'><EllipsisVertical className='h-5' /></div>
-                    <div className='px-4.5 bg-red-400 rounded-full py-2.5'><Phone className='h-5 rotate-135' /></div>
+                <div className="text-sm gap-x-2 flex flex-row items-center">
+                    <span>{dayjs().format("hh:mm A")}</span>
+                    <span>|</span>
+                    <span>{dayjs().format("MMM D, YYYY")}</span>
                 </div>
-                <div className='flex flex-row gap-x-7 '>
-                    <Info className='h-5' onClick={() => setShowMeetInfo(true)} />
-                    <Users className='h-5' onClick={() => setShowParticipants(true)} />
-                    <MessageSquareText className='h-5' onClick={() => setShowInCallMsg(true)} />
-                    <Shapes className='h-5' />
+                <div className='flex flex-row gap-x-3 '>
+                    <div onClick={() => { setIsUserSpeaking(!isUserSpeaking); setMicOn(!micOn) }} className=' px-3 bg-white rounded-lg py-2.5 cursor-pointer'>{!micOn ? <MicOff className='h-5 text-red-950' /> : <Mic className='h-5 text-red-950' />}</div>
+                    <div onClick={() => setCameraOn(!cameraOn)} className=' px-3 bg-white rounded-lg py-2.5 cursor-pointer'>{!cameraOn ? <VideoOff className='h-5 text-red-950' /> : <Video className='h-5 text-red-950' />}</div>
+                    <div onClick={() => setShowCaptions(!showCaptions)} className={`px-3 ${showCaptions ? 'bg-white text-red-950 rounded-lg cursor-pointer' : 'bg-gray-600 rounded-full'} py-2.5`}><Captions className='h-5' /></div>
+                    <div className=' px-3 bg-gray-600 rounded-full py-2.5 text-sm flex flex-row items-center justify-center font-semibold cursor-pointer'><span>Next Question</span><ChevronRight className='h-5' /></div>
+                    <div className='px-4.5 bg-red-400 rounded-full py-2.5 cursor-pointer'><Phone className='h-5 rotate-135' /></div>
+                </div>
+                <div className='flex flex-row gap-x-4 items-center'>
+                    <Info className='h-5 cursor-pointer' onClick={() => setShowMeetInfo(true)} />
+                    <Users className='h-5 cursor-pointer' onClick={() => setShowParticipants(true)} />
+                    <MessageSquareText className='h-5 cursor-pointer' onClick={() => setShowInCallMsg(true)} />
+                    <Button className="rounded-lg bg-gray-600 text-white hover:bg-gray-600 cursor-pointer" onClick={()=> setShowConfirmation(true)}>Submit Interview</Button>
                 </div>
             </div>
+            {showCaptions && <div className="absolute 2xl:bottom-[9%] bottom-[13%] bg-white text-black font-semibold"> <TypingText text={botMessage} /></div>}
             {showParticipants && <DrawerModal title={'People'} isOpen={showParticipants} onClose={() => setShowParticipants(false)}>
                 <div className='flex flex-col gap-y-3 py-5'>
                     <span className='text-xs'>IN THE MEETING</span>
@@ -212,6 +231,15 @@ const MeetPage = () => {
                     <span>Meeting Details</span>
                     <span>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quo culpa, consequuntur voluptas explicabo cumque maxime quidem eius mollitia, ullam quae eligendi adipisci accusamus maiores incidunt veniam ad et vitae earum!</span>
 
+                </div>
+            </DrawerModal>}
+            {showConfirmation && <DrawerModal title={'Submit Interview?'} isOpen={showConfirmation} onClose={() => setShowConfirmation(false)}>
+                <div className='flex flex-col gap-y-3 py-5 '>
+                    <span>Are you sure you want to submit and finish your interview? This action cannot be undone. <br/><br/>Thank you for your time — we’ll review your responses and get back to you shortly</span>
+                    <div className="flex flex-row gap-x-3 justify-end mt-5">
+                    <Button>No</Button>
+                    <Button>Yes</Button>
+                    </div>
                 </div>
             </DrawerModal>}
         </div>
