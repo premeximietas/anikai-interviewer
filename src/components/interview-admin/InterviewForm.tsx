@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
+import { CircleX, Plus } from "lucide-react";
 
 const interviewSchema = z.object({
     interview_name: z.string().min(1, "Interview name is required"),
@@ -64,9 +65,18 @@ const InterviewForm = () => {
         formik.setFieldValue("subject", [...formik.values.subject, { name: "", description: "", proficiency: "" }]);
     };
 
+    const removeSubject = (index: number) => {
+        if(subject.length === 1) return;
+        const updated = subject.filter((_, i) => i !== index);
+        setSubject(updated);
+        formik.setFieldValue("subject", updated);
+    };
+
     return (
-        <form onSubmit={formik.handleSubmit} className="space-y-4 p-4">
-        <div>
+        <form onSubmit={formik.handleSubmit} >
+            <div className="max-h-[70vh] overflow-y-auto p-3 gap-y-4 flex flex-col">
+        <div className="flex flex-row gap-x-4 w-full">
+        <div className="w-1/2">
           <span>Interview Name</span>
           <Input {...formik.getFieldProps("interview_name")} />
           {formik.touched.interview_name && formik.errors.interview_name && (
@@ -74,15 +84,16 @@ const InterviewForm = () => {
           )}
         </div>
   
-        <div>
+        <div className="w-1/2">
           <span>Role</span>
           <Input {...formik.getFieldProps("role")} />
           {formik.touched.role && formik.errors.role && (
             <p className="text-red-500 text-sm">{formik.errors.role}</p>
           )}
         </div>
-  
-        <div>
+        </div>
+        <div className="flex flex-row gap-x-4 w-full">
+        <div className="w-1/2">
           <span>Scheduled Time</span>
           <Input type="datetime-local" {...formik.getFieldProps("scheduled_time")} />
           {formik.touched.scheduled_time && formik.errors.scheduled_time && (
@@ -90,27 +101,35 @@ const InterviewForm = () => {
           )}
         </div>
   
-        <div>
+        <div className="w-1/2">
           <span>Duration (minutes)</span>
           <Input type="number" {...formik.getFieldProps("duration_minutes")} />
           {formik.touched.duration_minutes && formik.errors.duration_minutes && (
             <p className="text-red-500 text-sm">{formik.errors.duration_minutes}</p>
           )}
         </div>
+        </div>
   
         <div>
-          <span>Subjects</span>
+          <div className="flex flex-row justify-between items-center">
+          <span>Subjects</span><Button type="button" onClick={addSubject} size={"sm"}>Add Subject <Plus /></Button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-3">
+
           {subject.map((sub, index) => (
-            <div key={index} className="space-y-2 border p-2 rounded-md">
+            <div key={index} className="relative p-2">
+                <CircleX className="absolute top-0 right-0 text-gray-400" onClick={() => removeSubject(index)}/>
+              <div className="gap-y-2 border p-2 rounded-md flex flex-col relative">
               <Input
                 placeholder="Subject Name"
                 {...formik.getFieldProps(`subjects.${index}.name`)}
-              />
+                />
               {/* {formik.touched.subject?.[index]?.name && formik.errors.subject?.[index]?.name && (
                 <p className="text-red-500 text-sm">{formik.errors.subject[index]?.name}</p>
-              )} */}
-              
-              <Input
+                )} */}
+
+              <Textarea
+              rows={3}
                 placeholder="Description"
                 {...formik.getFieldProps(`subjects.${index}.description`)}
               />
@@ -124,12 +143,14 @@ const InterviewForm = () => {
               />
               {/* {formik.touched.subject?.[index]?.proficiency && formik.errors.subject?.[index]?.proficiency && (
                 <p className="text-red-500 text-sm">{formik.errors.subject[index]?.proficiency}</p>
-              )} */}
+                )} */}
+            </div>
             </div>
           ))}
-          <Button type="button" onClick={addSubject} className="mt-2">Add Subject</Button>
+          </div>
+          
         </div>
-  
+        </div>
         <Button type="submit">Submit</Button>
       </form>
     );
